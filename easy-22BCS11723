@@ -1,0 +1,27 @@
+import java.util.*;
+
+class AutoBoxingSum {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<Integer> numbers = new ArrayList<>();
+
+        System.out.println("Enter integers (type 'end' to finish):");
+        while (true) {
+            String input = scanner.nextLine();
+            if (input.equalsIgnoreCase("end")) break;
+            try {
+                Integer num = Integer.parseInt(input); // Autoboxing
+                numbers.add(num);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number. Try again.");
+            }
+        }
+
+        int sum = 0;
+        for (Integer num : numbers) {
+            sum += num; // Unboxing
+        }
+
+        System.out.println("Sum: " + sum);
+    }
+}
