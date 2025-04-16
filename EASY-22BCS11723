@@ -1,0 +1,168 @@
+Easy Level: Autoboxing & Sum Calculation
+import java.util.*;
+
+class AutoBoxingSum {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<Integer> numbers = new ArrayList<>();
+
+        System.out.println("Enter integers (type 'end' to finish):");
+        while (true) {
+            String input = scanner.nextLine();
+            if (input.equalsIgnoreCase("end")) break;
+            try {
+                Integer num = Integer.parseInt(input); // Autoboxing
+                numbers.add(num);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number. Try again.");
+            }
+        }
+
+        int sum = 0;
+        for (Integer num : numbers) {
+            sum += num; // Unboxing
+        }
+
+        System.out.println("Sum: " + sum);
+    }
+}
+
+Medium Level: Serialization and Deserialization
+import java.io.*;
+
+class Student implements Serializable {
+    private int id;
+    private String name;
+    private double gpa;
+
+    public Student(int id, String name, double gpa) {
+        this.id = id;
+        this.name = name;
+        this.gpa = gpa;
+    }
+
+    public void display() {
+        System.out.println("ID: " + id + ", Name: " + name + ", GPA: " + gpa);
+    }
+}
+
+class StudentSerializationDemo {
+    public static void main(String[] args) {
+        Student student = new Student(1, "Abhinav", 3.85);
+
+        // Serialize
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("student.ser"))) {
+            oos.writeObject(student);
+            System.out.println("Student object serialized.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Deserialize
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("student.ser"))) {
+            Student deserializedStudent = (Student) ois.readObject();
+            System.out.println("Deserialized Student:");
+            deserializedStudent.display();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found.");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+Hard Level: Employee Management System
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable {
+    private int id;
+    private String name;
+    private String designation;
+    private double salary;
+
+    public Employee(int id, String name, String designation, double salary) {
+        this.id = id;
+        this.name = name;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    public void display() {
+        System.out.println("ID: " + id + ", Name: " + name + ", Designation: " + designation + ", Salary: " + salary);
+    }
+}
+
+class AppendableObjectOutputStream extends ObjectOutputStream {
+    public AppendableObjectOutputStream(OutputStream out) throws IOException {
+        super(out);
+    }
+
+    @Override
+    protected void writeStreamHeader() throws IOException {
+        reset();
+    }
+}
+
+class EmployeeManager {
+    private static final String FILE_NAME = "employees.dat";
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n1. Add Employee\n2. Display All\n3. Exit");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    addEmployee(scanner);
+                    break;
+                case 2:
+                    displayAllEmployees();
+                    break;
+                case 3:
+                    System.out.println("Exiting application.");
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        } while (choice != 3);
+    }
+
+    private static void addEmployee(Scanner scanner) {
+        System.out.print("Enter ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        System.out.print("Enter Name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter Designation: ");
+        String designation = scanner.nextLine();
+        System.out.print("Enter Salary: ");
+        double salary = scanner.nextDouble();
+
+        Employee emp = new Employee(id, name, designation, salary);
+
+        try (ObjectOutputStream oos = new AppendableObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
+            oos.writeObject(emp);
+            System.out.println("Employee added.");
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e.getMessage());
+        }
+    }
+
+    private static void displayAllEmployees() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            while (true) {
+                Employee emp = (Employee) ois.readObject();
+                emp.display();
+            }
+        } catch (EOFException e) {
+            // End of file reached
+        } catch (Exception e) {
+            System.out.println("Error reading file: " + e.getMessage());
+        }
+    }
+}
